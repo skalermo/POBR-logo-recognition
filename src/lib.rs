@@ -1,8 +1,8 @@
 pub mod opencv_allowed;
+mod colors;
 
-pub fn adds_one(number: i32) -> i32 {
-    number + 1
-}
+pub use colors::convert_colors;
+pub use colors::Conversion::{BGR2HSV};
 
 #[cfg(test)]
 #[path = "../tests/tests.rs"]

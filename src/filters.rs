@@ -7,7 +7,7 @@ pub trait Filter {
         if dst.cols() != src.cols() || dst.rows() != src.rows() {
             *dst = Mat::zeros(src.rows(), src.cols(), src.typ()?)?.to_mat()?;
         }
-        let (dv, du) = self.size();
+        let (dv, du) = (self.size().0 / 2, self.size().1 / 2);
         for v in dv..src.rows()-dv {
             for u in du..src.cols()-du {
                 self.apply(src, dst, (v, u))?;
@@ -40,6 +40,8 @@ impl Filter for ConvFilter {
                 let f = self.kernel.mat[(y + kh) as usize][(x + kw) as usize];
                 let src_p = src.at_2d::<Vec3b>(vu.0 + y, vu.1 + x)?.0;
                 acc_p[0] += (src_p[0] as f64 * f).round() as i32;
+                acc_p[1] += (src_p[1] as f64 * f).round() as i32;
+                acc_p[2] += (src_p[2] as f64 * f).round() as i32;
             }
         }
         let dst_p = Vec3b::from(

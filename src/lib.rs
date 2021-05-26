@@ -4,11 +4,7 @@ mod filters;
 mod kernels;
 mod effects;
 
-pub use colors::{convert_colors, Conversion::BGR2HSV};
+pub use colors::{convert_colors, Conversion::BGR2HSV, in_range};
 pub use filters::rank_filter::Mode::{MinFilter, MedianFilter, MaxFilter};
 pub use effects::{convolve, apply_rank_filter};
 pub use kernels::DefaultKernels::{self, Blur};
-
-#[cfg(test)]
-#[path = "../tests/tests.rs"]
-mod tests;

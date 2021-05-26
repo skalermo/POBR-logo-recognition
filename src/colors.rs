@@ -47,8 +47,26 @@ fn bgr2hsv(pixel: [u8; 3]) -> [u8; 3] {
     [(h * 180.).round() as u8, s as u8, v as u8]
 }
 
+pub fn in_range(image: &Mat, low: (u8, u8, u8), high: (u8, u8, u8)) -> Result<Mat, Error> {
+    let mut mask = Mat::zeros(image.rows(), image.cols(), image.typ()?)?.to_mat()?;
+    for y in 0..image.rows() {
+        for x in 0..image.cols() {
+            if in_range_inner(image.at_2d::<Vec3b>(y, x)?.0, low, high) {
+                mask.at_2d_mut::<Vec3b>(y, x)?.0 = [255u8; 3];
+            }
+        }
+    }
+    Ok(mask)
+}
+
+fn in_range_inner(pixel: [u8; 3], low: (u8, u8, u8), high: (u8, u8, u8)) -> bool {
+    pixel[0] >= low.0 && pixel[0] <= high.0 &&
+        pixel[1] >= low.1 && pixel[1] <= high.1 &&
+        pixel[2] >= low.2 && pixel[2] <= high.2
+}
+
 #[cfg(test)]
-mod test {
+mod test_color_conversions {
     use super::*;
 
     #[test]
@@ -74,5 +92,30 @@ mod test {
     #[test]
     fn test_bgr2hsv_5() {
         assert_eq!([142, 245, 226], bgr2hsv([226, 9, 168]));
+    }
+}
+
+#[cfg(test)]
+mod test_in_range {
+    use super::*;
+
+    #[test]
+    fn test_pixel_is_in_range() {
+        assert!(in_range_inner([120, 240, 84], (119, 200, 84), (121, 240, 90)))
+    }
+
+    #[test]
+    fn test_first_component_not_in_range() {
+        assert!(!in_range_inner([120, 240, 84], (121, 200, 84), (121, 240, 90)))
+    }
+
+    #[test]
+    fn test_second_component_not_in_range() {
+        assert!(!in_range_inner([120, 240, 84], (119, 200, 84), (121, 230, 90)))
+    }
+
+    #[test]
+    fn test_third_component_not_in_range() {
+        assert!(!in_range_inner([120, 240, 84], (119, 200, 70), (121, 240, 83)))
     }
 }

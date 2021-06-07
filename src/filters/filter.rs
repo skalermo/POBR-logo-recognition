@@ -1,18 +1,15 @@
 use crate::opencv_allowed::{Mat, MatTrait, MatExprTrait, Error};
 
 pub trait Filter {
-    fn filter(&self, src: &Mat, dst: &mut Mat) -> Result<(), Error> {
-        // make sure src and dst have same size
-        if dst.cols() != src.cols() || dst.rows() != src.rows() {
-            *dst = Mat::zeros(src.rows(), src.cols(), src.typ()?)?.to_mat()?;
-        }
+    fn filter(&self, image: &Mat) -> Result<Mat, Error> {
+        let mut res = Mat::zeros(image.rows(), image.cols(), image.typ()?)?.to_mat()?;
         let (dv, du) = (self.size().0 / 2, self.size().1 / 2);
-        for v in dv..src.rows() - dv {
-            for u in du..src.cols() - du {
-                self.apply(src, dst, (v, u))?;
+        for v in dv..image.rows() - dv {
+            for u in du..image.cols() - du {
+                self.apply(image, &mut res, (v, u))?;
             }
         }
-        Ok(())
+        Ok(res)
     }
 
     fn apply(&self, src: &Mat, dst: &mut Mat, yx: (i32, i32)) -> Result<(), Error>;

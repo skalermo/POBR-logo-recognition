@@ -65,6 +65,34 @@ fn in_range_inner(pixel: [u8; 3], low: (u8, u8, u8), high: (u8, u8, u8)) -> bool
         pixel[2] >= low.2 && pixel[2] <= high.2
 }
 
+pub fn mask_and(mask1: &Mat, mask2: &Mat) -> Result<Mat, Error> {
+    assert!(mask1.rows() == mask2.rows() && mask1.cols() == mask2.cols());
+    let zeros = [0, 0, 0];
+    let mut mask = Mat::zeros(mask1.rows(), mask1.cols(), mask1.typ()?)?.to_mat()?;
+    for y in 0..mask.rows() {
+        for x in 0..mask.cols() {
+            if mask1.at_2d::<Vec3b>(y, x)?.0 != zeros && mask2.at_2d::<Vec3b>(y, x)?.0 != zeros {
+                mask.at_2d_mut::<Vec3b>(y, x)?.0 = [255u8; 3];
+            }
+        }
+    }
+    Ok(mask)
+}
+
+pub fn mask_or(mask1: &Mat, mask2: &Mat) -> Result<Mat, Error> {
+    assert!(mask1.rows() == mask2.rows() && mask1.cols() == mask2.cols());
+    let zeros = [0, 0, 0];
+    let mut mask = Mat::zeros(mask1.rows(), mask1.cols(), mask1.typ()?)?.to_mat()?;
+    for y in 0..mask.rows() {
+        for x in 0..mask.cols() {
+            if mask1.at_2d::<Vec3b>(y, x)?.0 != zeros || mask2.at_2d::<Vec3b>(y, x)?.0 != zeros {
+                mask.at_2d_mut::<Vec3b>(y, x)?.0 = [255u8; 3];
+            }
+        }
+    }
+    Ok(mask)
+}
+
 #[cfg(test)]
 mod test_color_conversions {
     use super::*;

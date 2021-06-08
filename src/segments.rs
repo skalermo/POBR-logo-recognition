@@ -12,16 +12,36 @@ pub struct Segment {
     col_max: i32,
     pixel_coords: Vec<(i32, i32)>,
     border_pixel_coords: Vec<(i32, i32)>,
-    label: String,
 }
 
 impl Segment {
+    pub fn get_row_min(&self) -> i32 {
+        self.row_min
+    }
+
+    pub fn get_row_max(&self) -> i32 {
+        self.row_max
+    }
+
+    pub fn get_col_min(&self) -> i32 {
+        self.col_min
+    }
+
+    pub fn get_col_max(&self) -> i32 {
+        self.col_max
+    }
+
     pub fn get_width(&self) -> u32 {
         (self.col_max - self.col_min + 1) as u32
     }
 
     pub fn get_height(&self) -> u32 {
         (self.row_max - self.row_min + 1) as u32
+    }
+
+    pub fn contains(&self, other: &Self) -> bool {
+        self.col_min < other.col_min && other.col_max < self.col_max &&
+            self.row_min < other.row_min && other.row_max < self.row_max
     }
 }
 
@@ -52,14 +72,6 @@ pub fn filter_out_segments(mut segments: Vec<Segment>, min_height: u32, min_widt
         ))
         .collect::<Vec<Segment>>();
     segments
-}
-
-pub fn draw_bounding_boxes(image: &Mat, segments: &Vec<Segment>) -> Result<Mat, Error> {
-    let boxes = segments
-        .iter()
-        .map(|seg| (seg.row_min, seg.col_min, seg.row_max, seg.col_max))
-        .collect::<Vec<(i32, i32, i32, i32)>>();
-    bounding_boxes(image, boxes)
 }
 
 fn flood_fill_segment(mask: &mut Mat, seed: (i32, i32)) -> Result<Segment, Error> {
@@ -107,7 +119,6 @@ fn flood_fill_segment(mask: &mut Mat, seed: (i32, i32)) -> Result<Segment, Error
         col_max,
         pixel_coords,
         border_pixel_coords,
-        label: "".to_string()
     })
 }
 

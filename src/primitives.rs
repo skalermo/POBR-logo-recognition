@@ -1,6 +1,8 @@
 use crate::opencv_allowed::{Mat, Error, MatTrait, Vec3b};
+use crate::{Segment, Cluster};
 
 static BB_COLOR: [u8; 3] = [4, 255, 16];
+
 
 pub fn horizontal_line(image: &Mat, y: i32, x_start: i32, x_end: i32) -> Result<Mat, Error> {
     assert!(x_start <= x_end);
@@ -57,4 +59,20 @@ pub fn bounding_boxes(image: &Mat, boxes: Vec<(i32, i32, i32, i32)>) -> Result<M
 
     }
     Ok(res)
+}
+
+pub fn draw_bounding_boxes_for_segments(image: &Mat, segments: &Vec<Segment>) -> Result<Mat, Error> {
+    let boxes = segments
+        .iter()
+        .map(|seg| (seg.get_row_min(), seg.get_col_min(), seg.get_row_max(), seg.get_col_max()))
+        .collect::<Vec<(i32, i32, i32, i32)>>();
+    bounding_boxes(image, boxes)
+}
+
+pub fn draw_bounding_boxes_for_clusters(image: &Mat, clusters: &Vec<Cluster>) -> Result<Mat, Error> {
+    let boxes = clusters
+        .iter()
+        .map(|clsr| (clsr.get_row_min(), clsr.get_col_min(), clsr.get_row_max(), clsr.get_col_max()))
+        .collect::<Vec<(i32, i32, i32, i32)>>();
+    bounding_boxes(image, boxes)
 }

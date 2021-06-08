@@ -1,6 +1,6 @@
 use crate::opencv_allowed::{Mat, Error};
 use super::filters::conv_filter::ConvFilter;
-use super::filters::rank_filter::{get_rank_filter, Mode, Mode::MinFilter};
+use super::filters::rank_filter::{get_rank_filter, Mode};
 use super::filters::filter::Filter;
 use super::kernels::Kernel;
 

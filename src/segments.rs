@@ -1,7 +1,5 @@
-use crate::opencv_allowed::{Mat, MatTrait, MatExprTrait, Vec3b, Error};
+use crate::opencv_allowed::{Mat, MatTrait, Vec3b, Error};
 use std::collections::VecDeque;
-use opencv::core::Vec3;
-use crate::primitives::bounding_boxes;
 
 
 #[derive(Debug)]

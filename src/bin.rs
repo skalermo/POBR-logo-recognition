@@ -1,11 +1,10 @@
 pub mod clusters_custom;
 
-use logo_lib::opencv_allowed::{imshow, imread, wait_key, Mat};
+use logo_lib::opencv_allowed::{imshow, imread, wait_key};
 #[allow(unused_imports)]
 use logo_lib::{convert_colors, convolve, erosion, dilation, closing, opening, apply_rank_filter, BGR2HSV, in_range, mask_or};
-use logo_lib::{DefaultKernels, Blur, MedianFilter, MinFilter, MaxFilter};
-use logo_lib::bounding_box;
-use logo_lib::{segment_mask_mut, filter_out_segments, draw_bounding_boxes_for_segments, draw_bounding_boxes_for_clusters};
+use logo_lib::MedianFilter;
+use logo_lib::{segment_mask_mut, filter_out_segments, draw_bounding_boxes_for_clusters};
 use crate::clusters_custom::build_clusters;
 
 fn main() {
@@ -29,10 +28,9 @@ fn main() {
     let mut yellow_segments = segment_mask_mut(&mut yellow_mask_filtered).unwrap();
     yellow_segments = filter_out_segments(yellow_segments, 15, 30, 300, 300);
 
-    let found_clusters = build_clusters(&yellow_segments, &blue_segments, &red_segments, &image);
+    let found_clusters = build_clusters(&yellow_segments, &blue_segments, &red_segments);
     println!("{:?}", found_clusters.len());
     let res = draw_bounding_boxes_for_clusters(&image, &found_clusters).unwrap();
     imshow("res", &res).unwrap();
-    // let test = draw_bounding_boxes(&image, &yellow_segments).unwrap();
     wait_key(0).unwrap();
 }

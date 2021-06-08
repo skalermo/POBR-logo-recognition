@@ -1,6 +1,7 @@
 use crate::opencv_allowed::{Mat, MatTrait, MatExprTrait, Vec3b, Error};
 use std::collections::VecDeque;
 use opencv::core::Vec3;
+use crate::primitives::bounding_boxes;
 
 
 #[derive(Debug)]
@@ -12,6 +13,16 @@ pub struct Segment {
     pixel_coords: Vec<(i32, i32)>,
     border_pixel_coords: Vec<(i32, i32)>,
     label: String,
+}
+
+impl Segment {
+    pub fn get_width(&self) -> u32 {
+        (self.col_max - self.col_min + 1) as u32
+    }
+
+    pub fn get_height(&self) -> u32 {
+        (self.row_max - self.row_min + 1) as u32
+    }
 }
 
 static BG_COLOR: [u8; 3] = [0; 3];
@@ -28,6 +39,27 @@ pub fn segment_mask_mut(mask: &mut Mat) -> Result<Vec<Segment>, Error> {
         }
     }
     Ok(segments)
+}
+
+pub fn filter_out_segments(mut segments: Vec<Segment>, min_height: u32, min_width: u32, max_height: u32, max_width: u32) -> Vec<Segment> {
+    segments = segments
+        .into_iter()
+        .filter(|seg| !(
+            seg.get_height() < min_height ||
+                seg.get_width() < min_width ||
+                seg.get_height() > max_height ||
+                seg.get_width() > max_width
+        ))
+        .collect::<Vec<Segment>>();
+    segments
+}
+
+pub fn draw_bounding_boxes(image: &Mat, segments: &Vec<Segment>) -> Result<Mat, Error> {
+    let boxes = segments
+        .iter()
+        .map(|seg| (seg.row_min, seg.col_min, seg.row_max, seg.col_max))
+        .collect::<Vec<(i32, i32, i32, i32)>>();
+    bounding_boxes(image, boxes)
 }
 
 fn flood_fill_segment(mask: &mut Mat, seed: (i32, i32)) -> Result<Segment, Error> {

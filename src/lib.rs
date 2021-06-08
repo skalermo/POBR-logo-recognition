@@ -11,4 +11,4 @@ pub use filters::rank_filter::Mode::{MinFilter, MedianFilter, MaxFilter};
 pub use effects::{convolve, apply_rank_filter, erosion, dilation, closing, opening};
 pub use kernels::DefaultKernels::{self, Blur};
 pub use primitives::bounding_box;
-pub use segments::segment_mask_mut;
+pub use segments::{segment_mask_mut, filter_out_segments, draw_bounding_boxes};

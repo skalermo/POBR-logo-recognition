@@ -3,6 +3,7 @@ use logo_lib::opencv_allowed::{imshow, imread, wait_key, Mat};
 use logo_lib::{convert_colors, convolve, erosion, dilation, closing, opening, apply_rank_filter, BGR2HSV, in_range, mask_or};
 use logo_lib::{DefaultKernels, Blur, MedianFilter, MinFilter, MaxFilter};
 use logo_lib::bounding_box;
+use logo_lib::segment_mask_mut;
 
 fn main() {
     let filename = "data/7.jpg";
@@ -27,6 +28,8 @@ fn main() {
     imshow("fblue", &filtered_blue_mask).unwrap();
     imshow("bb_test", &bb_test).unwrap();
     imshow("orange", &orange_mask).unwrap();
+    let res = segment_mask_mut(&mut orange_mask).unwrap();
+    println!("{:?}", res.len());
     // imshow("red", &red).unwrap();
     // imshow("fred", &filtered_red_mask).unwrap();
     wait_key(0).unwrap();
